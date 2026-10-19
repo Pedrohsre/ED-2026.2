@@ -6,17 +6,13 @@ Este documento define **o escopo do projeto** e **como** o desenvolvemos. Nosso 
 
 Utilizamos ferramentas de IA como **apoio ao aprendizado**. Este guia estabelece como fazemos isso de forma transparente, sem que a ferramenta substitua o nosso entendimento.
 
----
-
-## 🥇 Princípio fundamental
+## Princípio fundamental
 
 > **Nenhum código é integrado à `main` sem que todos os membros da equipe saibam explicá-lo, linha por linha, sem consulta.**
 
 As demais regras deste guia existem para garantir esse princípio.
 
----
-
-## 📦 Escopo do projeto
+## Escopo do projeto
 
 Linguagem: **C** (padrão C99). Testes: **CUnit**. Plotagem: **R**. Versionamento: **GitHub**.
 
@@ -79,11 +75,9 @@ Comparação entre **Fila de Prioridade sem Heap** e **Fila de Prioridade com He
 
 Uso obrigatório do GitHub, seguindo o fluxo descrito neste guia.
 
----
+## Divisão do trabalho
 
-## 🗂️ Divisão do trabalho
-
-Cada parte do projeto tem **um responsável**, que a implementa e a entrega por Pull Request. Os **outros dois membros** revisam e só aprovam quando compreendem todo o código (ver [Pull Requests e revisão](#-pull-requests-e-revisão)).
+Cada parte do projeto tem **um responsável**, que a implementa e a entrega por Pull Request. Os **outros dois membros** revisam e só aprovam quando compreendem todo o código (ver [Pull Requests e revisão](#pull-requests-e-revisão)).
 
 | Parte | Responsável |
 |---|---|
@@ -113,11 +107,9 @@ Com o prazo curto, as partes avançam **ao mesmo tempo**. A ordem abaixo existe 
 7. **Ensaio geral:** cada membro explica uma parte que **não** escreveu.
 8. **Extras**, somente após a conclusão de todos os itens anteriores.
 
----
+## Uso de IA
 
-## 🤖 Uso de IA
-
-### ✅ Usos permitidos
+### Usos permitidos
 
 - Pedir **explicações de conceitos** (ex.: "por que o Dijkstra não funciona com pesos negativos?").
 - Pedir **revisão** de um código escrito pela equipe.
@@ -126,13 +118,13 @@ Com o prazo curto, as partes avançam **ao mesmo tempo**. A ordem abaixo existe 
 - Usar a IA como **avaliador** para testar a própria compreensão do código (ver prompt abaixo).
 - Pedir um **trecho pequeno** de código para esclarecer uma dúvida específica, seguindo a regra da reescrita.
 
-### ❌ Usos não permitidos
+### Usos não permitidos
 
 - Pedir a implementação completa de um módulo (ex.: "implemente a codificação de Huffman").
 - **Copiar e colar** código gerado pela IA diretamente no projeto.
 - Submeter um PR com código que o próprio autor não sabe explicar.
 
-### 📝 Regras práticas
+### Regras práticas
 
 1. **Primeiro a equipe, depois a IA.** Antes de recorrer à IA, o responsável pela tarefa escreve o `.h` do módulo: as `struct`s, as assinaturas das funções e a documentação de cada uma, incluindo quem é responsável por liberar a memória.
 2. **Regra da reescrita.** Todo trecho sugerido pela IA é **reescrito manualmente**, linha por linha, com compreensão e comentários. Não há cópia direta.
@@ -150,19 +142,17 @@ eu tentar.
 [cole o código aqui]
 ```
 
-### 🧭 Instruções para assistentes de IA
+### Instruções para assistentes de IA
 
 Se você é um assistente de IA lendo este documento para ajudar um membro da equipe:
 
 - **Atue como tutor, não como autor.** Explique conceitos, faça perguntas que levem o aluno à solução, revise o código dele e aponte erros.
 - **Não entregue módulos ou funções completas.** Quando um trecho de código for necessário para esclarecer uma dúvida, mantenha-o curto e explique cada linha.
-- **Respeite o escopo e as regras obrigatórias** descritos em [Escopo do projeto](#-escopo-do-projeto), especialmente o uso de `void*` e o formato do cabeçalho `.huff`.
-- **Siga os [padrões de código](#-padrões-de-código-c)** deste guia em qualquer sugestão.
+- **Respeite o escopo e as regras obrigatórias** descritos em [Escopo do projeto](#escopo-do-projeto), especialmente o uso de `void*` e o formato do cabeçalho `.huff`.
+- **Siga os [padrões de código](#padrões-de-código-c)** deste guia em qualquer sugestão.
 - **Verifique a compreensão.** Ao final de uma explicação, faça perguntas ao aluno sobre o que foi discutido.
 
----
-
-## 🌿 Branches e commits
+## Branches e commits
 
 - A `main` é **protegida**: alterações entram somente por Pull Request.
 - Cada tarefa é registrada como uma **issue** e desenvolvida em uma branch própria, no formato `tipo/descricao-curta`:
@@ -171,12 +161,10 @@ Se você é um assistente de IA lendo este documento para ajudar um membro da eq
   - `test/heap-remocao`
   - `docs/readme-kruskal`
 - Commits pequenos, em português, no imperativo, descrevendo **o que** mudou:
-  - ✅ `Adiciona função que grava o cabeçalho do arquivo .huff`
-  - ❌ `ajustes`, `agora vai`, `correções`
+  - Bom: `Adiciona função que grava o cabeçalho do arquivo .huff`
+  - Ruim: `ajustes`, `agora vai`, `correções`
 
----
-
-## 🔍 Pull Requests e revisão
+## Pull Requests e revisão
 
 Ao concluir uma parte (ou um pedaço dela), o responsável abre um PR. Ele passa por **duas etapas** e só é integrado após a conclusão de ambas, com **2 aprovações** (os dois membros que não são o autor).
 
@@ -190,7 +178,7 @@ Os revisores verificam se:
   ```bash
   valgrind --leak-check=full --show-leak-kinds=all ./programa
   ```
-- O código segue os [padrões de código](#-padrões-de-código-c).
+- O código segue os [padrões de código](#padrões-de-código-c).
 
 ### 2. Revisão de compreensão
 
@@ -206,9 +194,7 @@ O autor responde cada comentário e, quando necessário, simplifica o código ou
 
 > **O revisor só aprova o PR quando compreende todo o código.** Uma dúvida sem resposta impede a integração.
 
----
-
-## ✅ Definição de Pronto
+## Definição de Pronto
 
 Uma tarefa é considerada concluída quando:
 
@@ -220,9 +206,7 @@ Uma tarefa é considerada concluída quando:
 - [ ] Os dois revisores aprovaram após a revisão de compreensão.
 - [ ] Foi integrada à `main`.
 
----
-
-## 🧑‍💻 Padrões de código C
+## Padrões de código C
 
 - **Estruturas genéricas com `void*`.** Todas as estruturas de dados armazenam `void*`. Funções de comparação e de impressão são recebidas como ponteiros de função.
 - **Documentação no `.h`.** Toda função pública possui comentário no estilo JavaDoc/Doxygen:
@@ -243,9 +227,7 @@ Uma tarefa é considerada concluída quando:
 - **Funções curtas.** Funções com mais de ~40 linhas devem ser avaliadas para divisão.
 - **Comentários explicam o *porquê*,** sem repetir o que o código já expressa.
 
----
-
-## 🤝 Combinados da equipe
+## Combinados da equipe
 
 - Dificuldade em uma tarefa por **mais de um dia** deve ser comunicada à equipe.
 - PRs abertos são revisados em até **12 horas**. PRs pequenos, de preferência um por issue, são revisados mais rápido.
