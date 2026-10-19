@@ -1,0 +1,24 @@
+# Slides do professor (não versionados)
+aulas/
+
+# Tudo o que o make gera (objetos, executáveis, saídas dos testes) vai para build/
+build/
+*.o
+*.exe
+a.out
+
+# Saídas geradas pelos módulos
+*.huff
+*.csv
+Rplots.pdf
+
+# valgrind e core dumps
+vgcore.*
+core
+
+# Editores e sistema
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
