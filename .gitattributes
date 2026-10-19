@@ -1,0 +1,3 @@
+# Quebras de linha do Linux em todos os arquivos de texto, inclusive em clones
+# no Windows: um Makefile com CRLF quebra o make no WSL.
+* text=auto eol=lf
