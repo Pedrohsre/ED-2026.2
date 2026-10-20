@@ -2,13 +2,13 @@
 #include <CUnit/Basic.h>
 #include "testes.h"
 
-/* Uma função de registro por arquivo de teste (declaradas em testes.h) */
-static int (*const registros[])(void) = {
-    registrar_testes_exemplo,
-};
-
 int main(void)
 {
+    /* Uma funcao de registro por arquivo de teste (declaradas em testes.h). */
+    int (*const registros[])(void) = {
+        registrar_testes_exemplo,
+        registrar_testes_contagem,
+    };
     if (CU_initialize_registry() != CUE_SUCCESS)
         return 1;
 

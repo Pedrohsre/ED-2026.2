@@ -53,3 +53,21 @@ Rscript scripts/grafico_contagem.R build/contagem.csv build/contagem.png
 ```
 
 Depois de gerar o gráfico, o `make contagem` abre a imagem com `xdg-open`. Em outra máquina, troque o comando: `make contagem ABRIR=wslview`.
+
+Por padrao sao 5000 insercoes, usando `time(NULL)` como semente. Para repetir
+um resultado no mesmo ambiente: `make contagem N=5000 SEMENTE=42`.
+O executavel aceita `./build/contagem [quantidade [semente]]`.
+Cada linha do CSV registra uma insercao; `n` e o tamanho antes dela, desde zero.
+O mesmo valor sorteado entra nas duas filas, com contadores locais separados,
+zerados por insercao e incrementados apenas pelo comparador.
+
+`include/filas.h` e `src/filas.c` oferecem somente criar, inserir e destruir
+na lista ordenada e no min-heap, com dados `void*`. As filas nao liberam os dados:
+`contagem_gerar` faz isso. Sao dependencias minimas da contagem, nao os TADs
+completos das issues #5 a #8. Substituir pelas interfaces do grupo quando existirem.
+
+Os quatro testes da contagem usam o executor CUnit existente e verificam
+contagens, empates, crescimento do heap, comparador e reproducibilidade do CSV.
+O grafico usa apenas R base. Compilacao, testes e geracao CSV/PNG foram
+verificados no Windows; execucao em Linux/WSL e Valgrind continuam pendentes.
+Uso de IA: implementacao e verificacoes da contagem preparadas com Codex.
