@@ -19,4 +19,6 @@ int registrar_testes_lista(void);
 int registrar_testes_grafo(void);
 int registrar_testes_kruskal(void);
 int registrar_testes_dijkstra(void);
+/** Registra os testes da contagem; retorna CUE_SUCCESS ou um erro do CUnit. */
+int registrar_testes_contagem(void);
 #endif

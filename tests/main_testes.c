@@ -16,6 +16,7 @@ static int (*const registros[])(void) = {
     registrar_testes_grafo,
     registrar_testes_kruskal,
     registrar_testes_dijkstra,
+    registrar_testes_contagem,
 };
 
 int main(void)
