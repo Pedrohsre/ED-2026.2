@@ -16,7 +16,8 @@ static FILE *arquivo_com(const void *dados, size_t tamanho)
 {
     FILE *arquivo = tmpfile();
     if (arquivo != NULL) {
-        fwrite(dados, 1, tamanho, arquivo);
+        if (tamanho > 0)
+            fwrite(dados, 1, tamanho, arquivo);
         rewind(arquivo);
     }
     return arquivo;
@@ -134,6 +135,88 @@ static void teste_descompactar_invalidos(void)
     CU_ASSERT_FALSE(descompacta(lixo_errado, sizeof lixo_errado));
 }
 
+/*
+ * Compacta os dados, descompacta o resultado e confere que voltou igual.
+ * Devolve o tamanho do .huff (ou -1 se algo falhou).
+ */
+static long ida_e_volta(const unsigned char *dados, size_t tamanho)
+{
+    static unsigned char volta[300000];
+    FILE *original = arquivo_com(dados, tamanho);
+    FILE *huff = tmpfile();
+    FILE *saida = tmpfile();
+    long tamanho_huff = -1;
+
+    if (huffman_compactar(original, huff)) {
+        tamanho_huff = ftell(huff);
+        rewind(huff);
+        if (!huffman_descompactar(huff, saida)
+            || ler_tudo(saida, volta, sizeof volta) != tamanho
+            || (tamanho > 0 && memcmp(volta, dados, tamanho) != 0))
+            tamanho_huff = -1;
+    }
+    fclose(original);
+    fclose(huff);
+    fclose(saida);
+    return tamanho_huff;
+}
+
+static void teste_compactar_exemplo_do_slide(void)
+{
+    FILE *original = arquivo_com(TEXTO_DO_SLIDE, strlen(TEXTO_DO_SLIDE));
+    FILE *huff = tmpfile();
+    int lixo, tamanho_arvore;
+
+    unsigned char buffer[64];
+
+    CU_ASSERT_TRUE(huffman_compactar(original, huff));
+    CU_ASSERT_EQUAL(ftell(huff), 2 + 11 + 7);   /* cabeçalho + árvore + 51 bits em 7 bytes */
+    rewind(huff);
+    CU_ASSERT_TRUE(huffman_ler_cabecalho(huff, &lixo, &tamanho_arvore));
+    CU_ASSERT_EQUAL(lixo, 5);
+    CU_ASSERT_EQUAL(tamanho_arvore, 11);
+    /* o .huff gerado é, byte a byte, o do slide */
+    CU_ASSERT_EQUAL(ler_tudo(huff, buffer, sizeof buffer), sizeof HUFF_DO_SLIDE);
+    CU_ASSERT(memcmp(buffer, HUFF_DO_SLIDE, sizeof HUFF_DO_SLIDE) == 0);
+    fclose(original);
+    fclose(huff);
+
+    CU_ASSERT_EQUAL(ida_e_volta((const unsigned char *) TEXTO_DO_SLIDE, strlen(TEXTO_DO_SLIDE)), 20);
+}
+
+static void teste_ida_e_volta_casos_de_borda(void)
+{
+    unsigned char um_byte_so[1000];
+    unsigned char todos_os_bytes[256];
+    unsigned char sem_lixo[] = "ABABABAB";   /* 8 bytes de 1 bit cada: lixo 0 */
+    unsigned char especiais[] = "**\\\\*\\ texto com * e \\";
+
+    memset(um_byte_so, 'A', sizeof um_byte_so);
+    for (int b = 0; b < 256; b++)
+        todos_os_bytes[b] = (unsigned char) b;
+
+    CU_ASSERT_EQUAL(ida_e_volta(NULL, 0), 2);   /* arquivo vazio: só o cabeçalho */
+    CU_ASSERT_NOT_EQUAL(ida_e_volta(um_byte_so, sizeof um_byte_so), -1);
+    CU_ASSERT_NOT_EQUAL(ida_e_volta(todos_os_bytes, sizeof todos_os_bytes), -1);
+    CU_ASSERT_EQUAL(ida_e_volta(sem_lixo, 8), 2 + 3 + 1);
+    CU_ASSERT_NOT_EQUAL(ida_e_volta(especiais, sizeof especiais - 1), -1);
+}
+
+/* Bytes pseudoaleatórios com distribuição desigual, como num arquivo binário */
+static void teste_ida_e_volta_arquivo_grande(void)
+{
+    static unsigned char dados[250000];
+    unsigned int semente = 12345;
+
+    for (size_t i = 0; i < sizeof dados; i++) {
+        semente = semente * 1103515245u + 12345u;
+        dados[i] = (unsigned char) ((semente >> 16) % ((i % 7 == 0) ? 256 : 40));
+    }
+    long tamanho_huff = ida_e_volta(dados, sizeof dados);
+    CU_ASSERT_NOT_EQUAL(tamanho_huff, -1);
+    CU_ASSERT(tamanho_huff < (long) sizeof dados);   /* com bytes desiguais, o arquivo diminui */
+}
+
 int registrar_testes_huffman(void)
 {
     CU_pSuite suite = CU_add_suite("huffman", NULL, NULL);
@@ -143,7 +226,10 @@ int registrar_testes_huffman(void)
         || CU_add_test(suite, "cabecalho", teste_cabecalho) == NULL
         || CU_add_test(suite, "descompactar o exemplo do slide", teste_descompactar_exemplo_do_slide) == NULL
         || CU_add_test(suite, "descompactar arquivo vazio", teste_descompactar_arquivo_vazio) == NULL
-        || CU_add_test(suite, "recusar .huff invalido", teste_descompactar_invalidos) == NULL)
+        || CU_add_test(suite, "recusar .huff invalido", teste_descompactar_invalidos) == NULL
+        || CU_add_test(suite, "compactar o exemplo do slide", teste_compactar_exemplo_do_slide) == NULL
+        || CU_add_test(suite, "ida e volta: casos de borda", teste_ida_e_volta_casos_de_borda) == NULL
+        || CU_add_test(suite, "ida e volta: arquivo grande", teste_ida_e_volta_arquivo_grande) == NULL)
         return CU_get_error();
     return CUE_SUCCESS;
 }

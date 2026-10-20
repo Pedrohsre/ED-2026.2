@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include "huffman_arvore.h"
+#include "fp_heap.h"
 
 #define NO_INTERNO '*'
 #define ESCAPE '\\'
@@ -127,4 +129,118 @@ NoHuffman *huffman_ler_arvore(FILE *entrada, int *restantes)
             return NULL;
     }
     return huffman_criar_folha((unsigned char) c, 0);   /* a frequência não é gravada no .huff */
+}
+
+/*
+ * A fila tira primeiro o nó de menor frequência. No empate, o nó interno sai
+ * antes da folha, como no slide (*3 antes de D3, *6 antes de A6), e a árvore
+ * do exemplo fica igual à do slide: **CB***FEDA.
+ */
+static int comparar_frequencia(const void *a, const void *b)
+{
+    const NoHuffman *x = a;
+    const NoHuffman *y = b;
+
+    if (x->frequencia != y->frequencia)
+        return x->frequencia < y->frequencia ? -1 : 1;
+    return huffman_eh_folha(x) - huffman_eh_folha(y);
+}
+
+/* Adaptador para a fila liberar os nós que sobrarem nela */
+static void liberar_no(void *no)
+{
+    huffman_destruir_arvore(no);
+}
+
+static int inserir_folha(FilaHeap *fila, unsigned char byte, unsigned long long frequencia)
+{
+    NoHuffman *folha = huffman_criar_folha(byte, frequencia);
+    if (folha == NULL)
+        return 0;
+    if (!fp_heap_inserir(fila, folha)) {
+        huffman_destruir_arvore(folha);
+        return 0;
+    }
+    return 1;
+}
+
+/* Um byte diferente do único que aparece no arquivo, para a folha extra */
+static unsigned char byte_extra(const unsigned long long freq[256])
+{
+    for (int b = 0; b < 256; b++)
+        if (freq[b] > 0)
+            return (unsigned char) (b + 1);   /* 255 + 1 vira 0 no unsigned char */
+    return 0;
+}
+
+/* Passo 1 do slide: uma folha na fila para cada byte que aparece */
+static FilaHeap *fila_de_folhas(const unsigned long long freq[256])
+{
+    FilaHeap *fila = fp_heap_criar(comparar_frequencia);
+    if (fila == NULL)
+        return NULL;
+
+    int ok = 1;
+    for (int b = 0; b < 256 && ok; b++)
+        if (freq[b] > 0)
+            ok = inserir_folha(fila, (unsigned char) b, freq[b]);
+    if (ok && fp_heap_tamanho(fila) == 1)
+        ok = inserir_folha(fila, byte_extra(freq), 0);
+
+    if (!ok) {
+        fp_heap_destruir(fila, liberar_no);
+        return NULL;
+    }
+    return fila;
+}
+
+NoHuffman *huffman_construir_arvore(const unsigned long long freq[256])
+{
+    FilaHeap *fila = fila_de_folhas(freq);
+    if (fila == NULL)
+        return NULL;
+
+    /* Passo 2 do slide: remove as duas menores e insere o pai, com a soma */
+    while (fp_heap_tamanho(fila) > 1) {
+        NoHuffman *esquerda = fp_heap_remover(fila);
+        NoHuffman *direita = fp_heap_remover(fila);
+        NoHuffman *pai = huffman_criar_no_interno(esquerda, direita);
+
+        if (pai == NULL) {
+            huffman_destruir_arvore(esquerda);
+            huffman_destruir_arvore(direita);
+        } else if (!fp_heap_inserir(fila, pai)) {
+            huffman_destruir_arvore(pai);
+            pai = NULL;
+        }
+        if (pai == NULL) {
+            fp_heap_destruir(fila, liberar_no);
+            return NULL;
+        }
+    }
+
+    NoHuffman *raiz = fp_heap_remover(fila);   /* NULL se a fila ficou vazia (arquivo vazio) */
+    fp_heap_destruir(fila, NULL);
+    return raiz;
+}
+
+static void montar(const NoHuffman *no, char *caminho, int profundidade, TabelaCodigos *tabela)
+{
+    if (huffman_eh_folha(no)) {
+        caminho[profundidade] = '\0';
+        strcpy(tabela->codigo[huffman_byte_da_folha(no)], caminho);
+        return;
+    }
+    caminho[profundidade] = '0';   /* esquerda = 0 */
+    montar(no->esquerda, caminho, profundidade + 1, tabela);
+    caminho[profundidade] = '1';   /* direita = 1 */
+    montar(no->direita, caminho, profundidade + 1, tabela);
+}
+
+void huffman_montar_codigos(const NoHuffman *raiz, TabelaCodigos *tabela)
+{
+    char caminho[257];
+
+    memset(tabela, 0, sizeof(TabelaCodigos));
+    montar(raiz, caminho, 0, tabela);
 }
