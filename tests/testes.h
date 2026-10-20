@@ -7,5 +7,7 @@
  * A função é declarada aqui e listada em tests/main_testes.c.
  */
 int registrar_testes_exemplo(void);
+int registrar_testes_heap(void);
+int registrar_testes_fp_heap(void);
 
 #endif
