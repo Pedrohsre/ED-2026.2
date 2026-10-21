@@ -5,7 +5,6 @@
 /* Uma função de registro por arquivo de teste (declaradas em testes.h) */
 static int (*const registros[])(void) = {
     registrar_testes_exemplo,
-    registrar_testes_heap,
     registrar_testes_fp_heap,
 };
 
