@@ -1,4 +1,5 @@
 #include <CUnit/Basic.h>
+#include "testes.h"
 #include "union_find.h"
 
 static void testar_criar_invalido(void) {
@@ -84,14 +85,10 @@ static void testar_destruir_null(void) {
     CU_PASS("destruir(NULL) não trava");
 }
 
-int main(void) {
-    if (CU_initialize_registry() != CUE_SUCCESS) return CU_get_error();
-
+int registrar_testes_union_find(void) {
     CU_pSuite suite = CU_add_suite("union_find", NULL, NULL);
-    if (suite == NULL) {
-        CU_cleanup_registry();
+    if (suite == NULL)
         return CU_get_error();
-    }
 
     CU_add_test(suite, "criar com tamanho invalido", testar_criar_invalido);
     CU_add_test(suite, "elementos comecam separados", testar_elementos_comecam_separados);
@@ -101,10 +98,5 @@ int main(void) {
     CU_add_test(suite, "unir dois grupos", testar_unir_dois_grupos);
     CU_add_test(suite, "cadeia grande (1000)", testar_cadeia_grande);
     CU_add_test(suite, "destruir NULL", testar_destruir_null);
-
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    unsigned falhas = CU_get_number_of_failures();
-    CU_cleanup_registry();
-    return falhas == 0 ? 0 : 1;
+    return CU_get_error();
 }

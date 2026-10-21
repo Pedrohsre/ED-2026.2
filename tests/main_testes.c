@@ -9,6 +9,7 @@ static int (*const registros[])(void) = {
     registrar_testes_bits,
     registrar_testes_huffman_arvore,
     registrar_testes_huffman,
+    registrar_testes_union_find,
 };
 
 int main(void)
