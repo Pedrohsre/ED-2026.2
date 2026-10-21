@@ -1,0 +1,6 @@
+c as 4 combinacoes de x1 e x2 sao proibidas
+p cnf 2 4
+1 2 0
+1 -2 0
+-1 2 0
+-1 -2 0

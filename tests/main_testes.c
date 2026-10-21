@@ -10,6 +10,8 @@ static int (*const registros[])(void) = {
     registrar_testes_huffman_arvore,
     registrar_testes_huffman,
     registrar_testes_union_find,
+    registrar_testes_sat,
+    registrar_testes_vetor,
 };
 
 int main(void)

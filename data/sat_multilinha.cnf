@@ -1,0 +1,7 @@
+c clausula em varias linhas e varias clausulas na mesma linha
+p cnf 4 3
+1 -2
+  3 0 -1 4 0
+c comentario no meio
+-3
+-4 0
