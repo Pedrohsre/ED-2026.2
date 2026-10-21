@@ -1,5 +1,6 @@
 #include "contagem.h"
 #include "filas.h"
+#include "fp_heap.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -21,7 +22,7 @@ static int inserir_dados(FILE *saida, size_t quantidade, FilaLista *lista,
         dados[quantidade + n] = (ElementoContagem){valor, &com_heap};
         sem_heap = com_heap = 0;
         if (!fila_lista_inserir(lista, &dados[n]) ||
-            !fila_heap_inserir(heap, &dados[quantidade + n]))
+            !fp_heap_inserir(heap, &dados[quantidade + n]))
             return 0;
         if (fprintf(saida, "%zu,%zu,%zu\n", n, sem_heap, com_heap) < 0)
             return 0;
@@ -38,7 +39,7 @@ int contagem_gerar(FILE *saida, size_t quantidade, unsigned int semente)
     if (quantidade > SIZE_MAX / sizeof *dados / 2)
         return 0;
     lista = fila_lista_criar(contagem_comparar);
-    heap = fila_heap_criar(contagem_comparar);
+    heap = fp_heap_criar(contagem_comparar);
     dados = quantidade ? malloc(2 * quantidade * sizeof *dados) : NULL;
     if (!lista || !heap || (quantidade && !dados))
         goto liberar;
@@ -49,7 +50,7 @@ int contagem_gerar(FILE *saida, size_t quantidade, unsigned int semente)
 liberar:
     /* As filas guardam ponteiros para dados, mas nunca liberam os elementos. */
     fila_lista_destruir(lista);
-    fila_heap_destruir(heap);
+    fp_heap_destruir(heap, NULL);
     free(dados);
     return sucesso && fflush(saida) == 0 && !ferror(saida);
 }

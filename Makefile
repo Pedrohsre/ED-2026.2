@@ -54,9 +54,10 @@ valgrind: $(BUILD)/testes
 	valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./$(BUILD)/testes
 
 # O programa da contagem imprime o CSV na saída padrão; o script R recebe o CSV e o PNG.
+# LANG=C.UTF-8 garante os acentos do gráfico em qualquer máquina.
 contagem: $(BUILD)/contagem
 	./$(BUILD)/contagem $(N) $(SEMENTE) > $(BUILD)/contagem.csv
-	Rscript scripts/grafico_contagem.R $(BUILD)/contagem.csv $(BUILD)/contagem.png
+	LANG=C.UTF-8 Rscript scripts/grafico_contagem.R $(BUILD)/contagem.csv $(BUILD)/contagem.png
 	-$(ABRIR) $(BUILD)/contagem.png
 
 clean:

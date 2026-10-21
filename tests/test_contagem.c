@@ -1,5 +1,6 @@
 #include "contagem.h"
 #include "filas.h"
+#include "fp_heap.h"
 #include "testes.h"
 #include <CUnit/Basic.h>
 #include <limits.h>
@@ -10,7 +11,7 @@ static void testar_sequencia(const int *valores, size_t quantidade,
     size_t lista_contador = 0, heap_contador = 0;
     ElementoContagem lista_dados[64], heap_dados[64];
     FilaLista *lista = fila_lista_criar(contagem_comparar);
-    FilaHeap *heap = fila_heap_criar(contagem_comparar);
+    FilaHeap *heap = fp_heap_criar(contagem_comparar);
     CU_ASSERT_PTR_NOT_NULL(lista);
     CU_ASSERT_PTR_NOT_NULL(heap);
     if (lista && heap) {
@@ -19,13 +20,13 @@ static void testar_sequencia(const int *valores, size_t quantidade,
             heap_dados[i] = (ElementoContagem){valores[i], &heap_contador};
             lista_contador = heap_contador = 0;
             CU_ASSERT(fila_lista_inserir(lista, &lista_dados[i]));
-            CU_ASSERT(fila_heap_inserir(heap, &heap_dados[i]));
+            CU_ASSERT(fp_heap_inserir(heap, &heap_dados[i]));
             CU_ASSERT_EQUAL(lista_contador, lista_esperada[i]);
             CU_ASSERT_EQUAL(heap_contador, heap_esperado[i]);
         }
     }
     fila_lista_destruir(lista);
-    fila_heap_destruir(heap);
+    fp_heap_destruir(heap, NULL);
 }
 
 static void testar_contagens(void)
