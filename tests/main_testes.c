@@ -6,6 +6,9 @@
 static int (*const registros[])(void) = {
     registrar_testes_exemplo,
     registrar_testes_fp_heap,
+    registrar_testes_bits,
+    registrar_testes_huffman_arvore,
+    registrar_testes_huffman,
 };
 
 int main(void)
