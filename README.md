@@ -23,6 +23,20 @@ sudo apt install build-essential libcunit1-dev valgrind r-base
 | `make contagem` | gera `build/contagem.csv` e o gráfico `build/contagem.png` |
 | `make clean` | apaga `build/` |
 
+## Como rodar cada programa
+
+Depois de `make`:
+
+| Programa | Exemplo |
+|---|---|
+| Huffman | `./build/huffman c foto.png` gera `foto.png.huff`; `./build/huffman d foto.png.huff volta.png` descompacta |
+| SAT Solver | `./build/sat data/sat_slide.cnf` imprime `SAT` com a atribuição, ou `UNSAT` |
+| Kruskal | `./build/kruskal data/grafo_exemplo.txt` imprime as arestas da árvore geradora mínima e o peso total |
+| Dijkstra | `./build/dijkstra data/grafo_dijkstra.txt 0` imprime a distância e o caminho a partir do vértice 0 |
+| Contagem | `make contagem` gera o CSV e o gráfico e abre a imagem |
+
+O arquivo de grafo tem o número de vértices e de arestas na primeira linha e, depois, uma aresta `u v peso` por linha (vértices de 0 a V-1). `sh scripts/testar_sat.sh` roda o SAT com todos os `.cnf` de `data/`.
+
 ## Estrutura
 
 | Pasta | Conteúdo |
