@@ -15,6 +15,8 @@ CFLAGS = -std=c99 -Wall -Wextra -g -Iinclude -MMD -MP
 LDLIBS = -lm
 BUILD  = build
 ABRIR ?= xdg-open
+N ?= 5000
+SEMENTE ?=
 
 MAINS       = $(wildcard src/main_*.c)
 MODULOS     = $(filter-out $(MAINS), $(wildcard src/*.c))
@@ -52,9 +54,10 @@ valgrind: $(BUILD)/testes
 	valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./$(BUILD)/testes
 
 # O programa da contagem imprime o CSV na saída padrão; o script R recebe o CSV e o PNG.
+# LANG=C.UTF-8 garante os acentos do gráfico em qualquer máquina.
 contagem: $(BUILD)/contagem
-	./$(BUILD)/contagem > $(BUILD)/contagem.csv
-	Rscript scripts/grafico_contagem.R $(BUILD)/contagem.csv $(BUILD)/contagem.png
+	./$(BUILD)/contagem $(N) $(SEMENTE) > $(BUILD)/contagem.csv
+	LANG=C.UTF-8 Rscript scripts/grafico_contagem.R $(BUILD)/contagem.csv $(BUILD)/contagem.png
 	-$(ABRIR) $(BUILD)/contagem.png
 
 clean:
