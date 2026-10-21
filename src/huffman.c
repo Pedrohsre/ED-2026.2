@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include "huffman.h"
 #include "huffman_arvore.h"
@@ -33,6 +34,65 @@ int huffman_ler_cabecalho(FILE *entrada, int *lixo, int *tamanho_arvore)
 
     *lixo = byte1 >> 5;
     *tamanho_arvore = ((byte1 & 0x1F) << 8) | byte2;   /* 0x1F = 00011111 */
+    return 1;
+}
+
+static int arquivo_vazio(const unsigned long long freq[256])
+{
+    for (int b = 0; b < 256; b++)
+        if (freq[b] > 0)
+            return 0;
+    return 1;
+}
+
+/* O total de bits já é conhecido antes de gravar: soma de frequência × tamanho do código */
+static int calcular_lixo(const unsigned long long freq[256], const TabelaCodigos *tabela)
+{
+    unsigned long long total_bits = 0;
+
+    for (int b = 0; b < 256; b++)
+        total_bits += freq[b] * strlen(tabela->codigo[b]);
+    return (int) ((8 - total_bits % 8) % 8);
+}
+
+/* Relê o arquivo original e grava o código de cada byte, bit a bit */
+static void gravar_dados(FILE *entrada, FILE *saida, const TabelaCodigos *tabela)
+{
+    EscritorBits escritor;
+    int c;
+
+    bits_iniciar_escritor(&escritor, saida);
+    while ((c = fgetc(entrada)) != EOF)
+        for (const char *bit = tabela->codigo[c]; *bit != '\0'; bit++)
+            bits_gravar(&escritor, *bit == '1');
+    bits_finalizar(&escritor);
+}
+
+int huffman_compactar(FILE *entrada, FILE *saida)
+{
+    unsigned long long freq[256];
+
+    huffman_contar_frequencias(entrada, freq);
+    if (arquivo_vazio(freq)) {
+        huffman_gravar_cabecalho(saida, 0, 0);
+        return 1;
+    }
+
+    NoHuffman *raiz = huffman_construir_arvore(freq);
+    TabelaCodigos *tabela = malloc(sizeof(TabelaCodigos));
+    if (raiz == NULL || tabela == NULL) {
+        huffman_destruir_arvore(raiz);
+        free(tabela);
+        return 0;
+    }
+    huffman_montar_codigos(raiz, tabela);
+
+    huffman_gravar_cabecalho(saida, calcular_lixo(freq, tabela), huffman_tamanho_arvore(raiz));
+    huffman_gravar_arvore(raiz, saida);
+    gravar_dados(entrada, saida, tabela);   /* contar_frequencias já voltou ao início */
+
+    huffman_destruir_arvore(raiz);
+    free(tabela);
     return 1;
 }
 

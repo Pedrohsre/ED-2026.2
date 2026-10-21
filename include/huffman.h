@@ -34,6 +34,16 @@ void huffman_gravar_cabecalho(FILE *saida, int lixo, int tamanho_arvore);
 int huffman_ler_cabecalho(FILE *entrada, int *lixo, int *tamanho_arvore);
 
 /**
+ * Compacta um arquivo: cabeçalho, árvore em pré-ordem e os códigos de cada
+ * byte, bit a bit. Um arquivo vazio vira um .huff só com o cabeçalho zerado.
+ *
+ * @param entrada  Arquivo original aberto em "rb", posicionado no início.
+ * @param saida    Arquivo .huff aberto em "wb".
+ * @return         1 se deu certo; 0 se faltou memória.
+ */
+int huffman_compactar(FILE *entrada, FILE *saida);
+
+/**
  * Descompacta um arquivo .huff.
  *
  * Um .huff com tamanho de árvore 0 e nada depois do cabeçalho representa um

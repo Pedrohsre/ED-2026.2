@@ -84,4 +84,34 @@ void huffman_gravar_arvore(const NoHuffman *raiz, FILE *saida);
  */
 NoHuffman *huffman_ler_arvore(FILE *entrada, int *restantes);
 
+/**
+ * Monta a árvore de Huffman com a fila de prioridade com heap: uma folha por
+ * byte que aparece; depois junta as duas de menor frequência até sobrar uma.
+ *
+ * Com um só byte distinto, a árvore seria uma folha só e o código teria 0
+ * bits. Nesse caso é criada uma folha extra, de frequência 0, para o byte
+ * ganhar um código de 1 bit.
+ *
+ * @param freq  Frequência de cada byte (256 posições).
+ * @return      A raiz, ou NULL se nenhum byte aparece (arquivo vazio) ou faltar
+ *              memória. Liberar com huffman_destruir_arvore.
+ */
+NoHuffman *huffman_construir_arvore(const unsigned long long freq[256]);
+
+/**
+ * Tabela com o código de cada byte, como texto de '0' e '1'.
+ * Um código tem no máximo 255 bits (a profundidade máxima com 256 folhas).
+ */
+typedef struct {
+    char codigo[256][257];   /* codigo[b] é "" se o byte b não aparece no arquivo */
+} TabelaCodigos;
+
+/**
+ * Percorre a árvore e anota o caminho até cada folha: esquerda = '0', direita = '1'.
+ *
+ * @param raiz    Raiz da árvore, com pelo menos um nó interno.
+ * @param tabela  Tabela a preencher (é zerada antes).
+ */
+void huffman_montar_codigos(const NoHuffman *raiz, TabelaCodigos *tabela);
+
 #endif
