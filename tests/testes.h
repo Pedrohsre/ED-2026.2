@@ -15,4 +15,7 @@ int registrar_testes_union_find(void);
 
 int registrar_testes_sat(void);
 int registrar_testes_vetor(void);
+int registrar_testes_lista(void);
+int registrar_testes_grafo(void);
+int registrar_testes_kruskal(void);
 #endif
