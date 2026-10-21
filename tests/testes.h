@@ -13,4 +13,6 @@ int registrar_testes_huffman_arvore(void);
 int registrar_testes_huffman(void);
 int registrar_testes_union_find(void);
 
+int registrar_testes_sat(void);
+int registrar_testes_vetor(void);
 #endif
