@@ -4,6 +4,10 @@
 /*
  * Fila de prioridade com heap (Aula 19). Guarda void* sem copiar os dados e
  * tira primeiro o elemento que o comparador considera menor.
+ * A prioridade é a menor frequência: o comparador faz a fila tirar primeiro o nó menos frequente. 
+ Juntando sempre os dois menores, os bytes raros ficam no fundo da árvore, com códigos longos, e os
+ frequentes perto da raiz, com códigos curtos. Isso minimiza o total de bits. No empate, o nó interno
+ sai antes, e por isso a nossa árvore é igual à do slide.
  */
 
 /** Negativo se a sai antes de b; 0 se empatam; positivo se b sai antes de a. */
