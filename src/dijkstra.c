@@ -3,6 +3,8 @@
 #include "dijkstra.h"
 #include "fp_heap.h"
 
+static int relaxacoes;
+
 /* Entrada da fila: um vértice e a distância com que ele foi inserido */
 typedef struct {
     int distancia;
@@ -73,6 +75,7 @@ static int relaxar_vizinhos(const Grafo *grafo, CaminhosMinimos *caminhos, FilaH
         if (caminhos->distancia[v] == DIJKSTRA_INALCANCAVEL || nova < caminhos->distancia[v]) {
             caminhos->distancia[v] = nova;
             caminhos->anterior[v] = u;
+            relaxacoes++;
             if (!inserir(fila, nova, v))   /* reinsere em vez de diminuir a prioridade */
                 return 0;
         }
@@ -82,6 +85,7 @@ static int relaxar_vizinhos(const Grafo *grafo, CaminhosMinimos *caminhos, FilaH
 
 static int percorrer(const Grafo *grafo, CaminhosMinimos *caminhos, FilaHeap *fila)
 {
+    relaxacoes = 0;
     int ok = inserir(fila, 0, caminhos->origem);
 
     while (ok && fp_heap_tamanho(fila) > 0) {
@@ -142,6 +146,7 @@ void dijkstra_imprimir(const CaminhosMinimos *caminhos)
             printf(")\n");
         }
     }
+    printf("Relaxações: %d\n", relaxacoes);
 }
 
 void dijkstra_destruir(CaminhosMinimos *caminhos)
